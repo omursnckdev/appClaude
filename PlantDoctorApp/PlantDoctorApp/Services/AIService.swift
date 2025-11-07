@@ -31,7 +31,7 @@ class AIService {
         self.apiKey = key
     }
 
-    func analyzePlantImage(_ image: UIImage) async throws -> PlantAnalysisResult {
+    func analyzePlantImage(_ image: UIImage, language: AppLanguage = .english) async throws -> PlantAnalysisResult {
         guard !apiKey.isEmpty else {
             throw AIServiceError.apiKeyMissing
         }
@@ -67,10 +67,21 @@ class AIService {
                         [
                             "type": "text",
                             "text": """
-                            You are a plant disease expert. Analyze this plant image and provide a diagnosis.
+                            You are a plant expert. Analyze this plant image and provide both identification and health diagnosis.
 
                             Please respond in the following JSON format:
                             {
+                                "plantIdentification": {
+                                    "species": "Plant species name",
+                                    "commonName": "Common name",
+                                    "scientificName": "Scientific name",
+                                    "family": "Plant family",
+                                    "description": "Brief description of the plant",
+                                    "careLevel": "Easy/Moderate/Difficult",
+                                    "wateringNeeds": "Description of watering requirements",
+                                    "sunlightNeeds": "Description of sunlight requirements",
+                                    "confidenceLevel": "High/Medium/Low"
+                                },
                                 "isHealthy": true/false,
                                 "diagnosis": "Brief diagnosis of the plant's condition",
                                 "problems": ["list", "of", "specific", "issues"],
@@ -78,7 +89,7 @@ class AIService {
                                 "confidenceLevel": "High/Medium/Low"
                             }
 
-                            Look for:
+                            First, identify the plant species. Then look for health issues:
                             - Leaf discoloration (yellowing, browning, spots)
                             - Wilting or drooping
                             - Pests or insects
@@ -87,7 +98,8 @@ class AIService {
                             - Root problems
                             - Environmental stress
 
-                            Be specific about what you observe and provide actionable treatment advice.
+                            Respond in \(language.displayName) language.
+                            Be specific and provide actionable treatment advice.
                             """
                         ]
                     ]
@@ -119,6 +131,22 @@ class AIService {
             throw AIServiceError.invalidResponse
         }
 
+        // Parse plant identification
+        var plantIdentification: PlantIdentification?
+        if let identificationJson = analysisJson["plantIdentification"] as? [String: Any] {
+            plantIdentification = PlantIdentification(
+                species: identificationJson["species"] as? String ?? "Unknown",
+                commonName: identificationJson["commonName"] as? String ?? "Unknown",
+                scientificName: identificationJson["scientificName"] as? String ?? "Unknown",
+                family: identificationJson["family"] as? String ?? "Unknown",
+                description: identificationJson["description"] as? String ?? "",
+                careLevel: identificationJson["careLevel"] as? String ?? "Moderate",
+                wateringNeeds: identificationJson["wateringNeeds"] as? String ?? "",
+                sunlightNeeds: identificationJson["sunlightNeeds"] as? String ?? "",
+                confidenceLevel: identificationJson["confidenceLevel"] as? String ?? "Medium"
+            )
+        }
+
         // Parse the analysis result
         let isHealthy = analysisJson["isHealthy"] as? Bool ?? false
         let diagnosis = analysisJson["diagnosis"] as? String ?? "Unable to determine"
@@ -131,7 +159,8 @@ class AIService {
             problems: problems,
             treatment: treatment,
             isHealthy: isHealthy,
-            confidenceLevel: confidenceLevel
+            confidenceLevel: confidenceLevel,
+            plantIdentification: plantIdentification
         )
     }
 

@@ -13,6 +13,54 @@ struct AnalysisResultView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 15) {
+                // Plant Identification
+                if let identification = result.plantIdentification {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Plant Identification")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(identification.commonName)
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                Text(identification.scientificName)
+                                    .font(.subheadline)
+                                    .italic()
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                        }
+
+                        if !identification.description.isEmpty {
+                            Text(identification.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        HStack(spacing: 20) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "drop.fill")
+                                    .foregroundColor(.blue)
+                                Text(identification.wateringNeeds)
+                                    .font(.caption)
+                            }
+
+                            HStack(spacing: 4) {
+                                Image(systemName: "sun.max.fill")
+                                    .foregroundColor(.orange)
+                                Text(identification.sunlightNeeds)
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    .padding(.bottom, 10)
+
+                    Divider()
+                }
+
                 // Health status
                 HStack {
                     Image(systemName: result.isHealthy ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")

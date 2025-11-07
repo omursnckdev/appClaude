@@ -4,11 +4,21 @@ An iOS app that uses AI to diagnose plant diseases and health issues. Simply tak
 
 ## Features
 
+### Core Analysis
 - 📸 **Camera Integration** - Take photos directly or choose from your photo library
 - 🤖 **AI-Powered Analysis** - Uses Claude, OpenAI GPT-4 Vision, or Google Gemini for accurate plant disease detection
-- 🔥 **Firebase Backend** - Secure image storage and data management
+- 🌿 **Plant Identification** - Automatically identifies plant species with scientific names, care requirements, and detailed information
 - 📊 **Detailed Results** - Get comprehensive diagnosis, identified problems, and treatment plans
-- 🎨 **Beautiful SwiftUI Interface** - Modern, intuitive design
+
+### Advanced Features
+- 📚 **History Tracking** - View and manage all your plant analyses with searchable history
+- ⏰ **Care Reminders** - Set up watering, fertilizing, and maintenance reminders for your plants
+- 👥 **Community Sharing** - Share your plant findings with other users and learn from the community
+- 📱 **Offline Mode** - Local caching allows you to view past analyses without internet connection
+- 🌍 **Multi-Language Support** - Available in 10+ languages (English, Spanish, French, German, Chinese, Japanese, Korean, Portuguese, Italian, Russian)
+- 📄 **Export Reports** - Export individual analyses as PDF or entire history as CSV
+- 🔥 **Firebase Backend** - Secure image storage and data management
+- 🎨 **Beautiful SwiftUI Interface** - Modern, intuitive design with tab-based navigation
 
 ## Technology Stack
 
@@ -154,6 +164,8 @@ PlantDoctorApp/
 
 ## Usage
 
+### Analyzing Plants
+
 1. **Launch the App** - Open Plant Doctor on your iOS device
 2. **Choose Input Method**:
    - Tap "Camera" to take a new photo
@@ -161,25 +173,77 @@ PlantDoctorApp/
 3. **Capture/Select Plant Image** - Make sure the plant and any visible issues are clearly visible
 4. **Wait for Analysis** - The AI will process the image (usually takes 3-10 seconds)
 5. **Review Results**:
+   - Plant identification (species, care requirements)
    - Health status indicator
    - Detailed diagnosis
    - List of identified problems
    - Treatment recommendations
    - Confidence level
 
+### Using History
+
+1. Navigate to the **History** tab
+2. View all your past plant analyses
+3. Tap any record to see full details
+4. Swipe left on a record to:
+   - Export as PDF
+   - Delete from history
+5. Use the menu to:
+   - Export all history as CSV
+   - Clear entire history
+
+### Setting Up Reminders
+
+1. Navigate to the **Reminders** tab
+2. Tap the **+** button to add a new reminder
+3. Fill in:
+   - Plant name
+   - Reminder type (Watering, Fertilizing, Pruning, etc.)
+   - Frequency in days
+   - Optional notes
+4. Mark reminders as completed by tapping the checkmark
+5. View overdue reminders highlighted in red
+
+### Sharing with Community
+
+1. Navigate to the **Community** tab
+2. Tap the share button to post an analysis
+3. Select a plant from your history
+4. Add a caption
+5. Share with the community
+6. Like and comment on others' posts
+7. Pull down to refresh the feed
+
+### Adjusting Settings
+
+1. Navigate to the **Settings** tab
+2. Change language preference
+3. Select preferred AI provider (Claude/OpenAI/Gemini)
+4. Toggle notifications
+5. View and clear cache
+6. Access about, privacy policy, and terms
+
 ## How It Works
 
 1. **Image Capture** - User takes a photo using the device camera or selects from library
-2. **Image Upload** - Photo is uploaded to Firebase Storage for backup
+2. **Image Upload** - Photo is uploaded to Firebase Storage for backup and saved locally
 3. **AI Analysis** - Image is sent to the selected AI service (Claude/OpenAI/Gemini)
-4. **Processing** - AI analyzes the image for:
+4. **Plant Identification** - AI identifies the plant species, providing:
+   - Common and scientific names
+   - Plant family
+   - Care level (Easy/Moderate/Difficult)
+   - Watering and sunlight requirements
+   - Brief description
+5. **Health Analysis** - AI analyzes the plant for:
    - Leaf discoloration (yellowing, browning, spots)
    - Wilting or drooping
    - Pest infestations
    - Fungal infections
    - Nutrient deficiencies
    - Environmental stress
-5. **Results Display** - Structured diagnosis and treatment plan is shown to the user
+6. **Results Display** - Comprehensive identification and diagnosis shown to user
+7. **Save to History** - Analysis is automatically saved for future reference
+8. **Offline Caching** - Results are cached locally for offline viewing
 
 ## Troubleshooting
 
@@ -207,15 +271,28 @@ PlantDoctorApp/
 - Keep your API keys secure and rotate them if exposed
 - Consider implementing rate limiting for production apps
 
+## Completed Features ✅
+
+- [x] History of analyzed plants
+- [x] Plant identification (not just disease detection)
+- [x] Care reminders and tracking
+- [x] Community features (share findings)
+- [x] Offline mode with cached data
+- [x] Multiple language support
+- [x] Export analysis reports (PDF & CSV)
+
 ## Future Enhancements
 
-- [ ] History of analyzed plants
-- [ ] Plant identification (not just disease detection)
-- [ ] Care reminders and tracking
-- [ ] Community features (share findings)
-- [ ] Offline mode with cached data
-- [ ] Multiple language support
-- [ ] Export analysis reports
+- [ ] Push notifications for care reminders
+- [ ] Plant care journal with notes
+- [ ] Advanced search and filters in history
+- [ ] Social features (follow users, direct messaging)
+- [ ] Plant care guides library
+- [ ] Integration with plant care databases
+- [ ] AR mode for plant visualization
+- [ ] Voice commands for hands-free operation
+- [ ] Plant health trends and analytics
+- [ ] Integration with smart home devices
 
 ## API Cost Considerations
 
