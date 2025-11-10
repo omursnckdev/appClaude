@@ -62,7 +62,20 @@ struct SettingsView: View {
 
                 Section(header: Text("Notifications")) {
                     Toggle("Care Reminders", isOn: $viewModel.notificationsEnabled)
+                        .onChange(of: viewModel.notificationsEnabled) { newValue in
+                            Task {
+                                await viewModel.toggleNotifications(newValue)
+                            }
+                        }
+
                     Toggle("Community Updates", isOn: $viewModel.communityNotificationsEnabled)
+                        .onChange(of: viewModel.communityNotificationsEnabled) { newValue in
+                            viewModel.toggleCommunityNotifications(newValue)
+                        }
+
+                    Text("Get reminded about watering, fertilizing, and other care tasks")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
 
                 Section(header: Text("About")) {
@@ -107,6 +120,11 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .alert("Notifications", isPresented: $viewModel.showNotificationAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.notificationAlertMessage)
+            }
         }
     }
 }
@@ -121,13 +139,65 @@ enum AIProvider: String, CaseIterable {
 class SettingsViewModel: ObservableObject {
     @Published var selectedLanguage: AppLanguage
     @Published var selectedAIProvider: AIProvider = .claude
-    @Published var notificationsEnabled = true
+    @Published var notificationsEnabled = false
     @Published var communityNotificationsEnabled = false
     @Published var cacheSize = "Calculating..."
+    @Published var showNotificationAlert = false
+    @Published var notificationAlertMessage = ""
+
+    private let notificationService = NotificationService.shared
+    private let userDefaults = UserDefaults.standard
+    private let notificationSettingsKey = "notificationsEnabled"
+    private let communityNotificationSettingsKey = "communityNotificationsEnabled"
 
     init() {
         self.selectedLanguage = LocalizationService.shared.getLanguage()
+        // Load notification settings from UserDefaults
+        self.notificationsEnabled = userDefaults.bool(forKey: notificationSettingsKey)
+        self.communityNotificationsEnabled = userDefaults.bool(forKey: communityNotificationSettingsKey)
         calculateCacheSize()
+        checkNotificationStatus()
+    }
+
+    func checkNotificationStatus() {
+        Task {
+            await notificationService.checkAuthorizationStatus()
+            // Update the toggle based on actual authorization status
+            notificationsEnabled = notificationService.isAuthorized
+        }
+    }
+
+    func toggleNotifications(_ enabled: Bool) async {
+        if enabled {
+            // Request notification permission
+            do {
+                let granted = try await notificationService.requestAuthorization()
+                if granted {
+                    notificationsEnabled = true
+                    userDefaults.set(true, forKey: notificationSettingsKey)
+                    notificationAlertMessage = "Notifications enabled! You'll receive reminders for plant care tasks."
+                } else {
+                    notificationsEnabled = false
+                    userDefaults.set(false, forKey: notificationSettingsKey)
+                    notificationAlertMessage = "Notification permission denied. Please enable it in Settings."
+                }
+                showNotificationAlert = true
+            } catch {
+                notificationsEnabled = false
+                userDefaults.set(false, forKey: notificationSettingsKey)
+                notificationAlertMessage = "Failed to request notification permission: \(error.localizedDescription)"
+                showNotificationAlert = true
+            }
+        } else {
+            // Disable notifications
+            notificationsEnabled = false
+            userDefaults.set(false, forKey: notificationSettingsKey)
+        }
+    }
+
+    func toggleCommunityNotifications(_ enabled: Bool) {
+        communityNotificationsEnabled = enabled
+        userDefaults.set(enabled, forKey: communityNotificationSettingsKey)
     }
 
     func updateLanguage(_ language: AppLanguage) {

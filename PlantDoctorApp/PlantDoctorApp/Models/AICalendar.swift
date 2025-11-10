@@ -53,6 +53,10 @@ struct CareSchedule: Codable, Identifiable {
         case rotation = "Rotation"
         case inspection = "Inspection"
 
+        var displayName: String {
+            return self.rawValue
+        }
+
         var icon: String {
             switch self {
             case .watering: return "drop.fill"

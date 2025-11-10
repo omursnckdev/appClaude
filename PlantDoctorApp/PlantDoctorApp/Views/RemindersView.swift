@@ -182,6 +182,7 @@ struct AddReminderView: View {
 @MainActor
 class RemindersViewModel: ObservableObject {
     @Published var reminders: [CareReminder] = []
+    private let notificationService = NotificationService.shared
 
     init() {
         loadReminders()
@@ -205,6 +206,22 @@ class RemindersViewModel: ObservableObject {
             notes: notes
         )
         PersistenceService.shared.saveReminder(reminder)
+
+        // Schedule notification for the reminder
+        Task {
+            do {
+                try await notificationService.scheduleCareReminder(
+                    id: reminder.id.uuidString,
+                    plantName: reminder.plantName,
+                    reminderType: reminder.reminderType.rawValue,
+                    dueDate: reminder.nextDue,
+                    notes: reminder.notes.isEmpty ? nil : reminder.notes
+                )
+            } catch {
+                print("Failed to schedule notification: \(error)")
+            }
+        }
+
         loadReminders()
     }
 
@@ -212,10 +229,29 @@ class RemindersViewModel: ObservableObject {
         var updatedReminder = reminder
         updatedReminder.markCompleted()
         PersistenceService.shared.saveReminder(updatedReminder)
+
+        // Update notification for the new due date
+        Task {
+            do {
+                try await notificationService.updateNotification(
+                    id: updatedReminder.id.uuidString,
+                    plantName: updatedReminder.plantName,
+                    reminderType: updatedReminder.reminderType.rawValue,
+                    newDueDate: updatedReminder.nextDue,
+                    notes: updatedReminder.notes.isEmpty ? nil : updatedReminder.notes
+                )
+            } catch {
+                print("Failed to update notification: \(error)")
+            }
+        }
+
         loadReminders()
     }
 
     func deleteReminder(_ reminder: CareReminder) {
+        // Cancel notification
+        notificationService.cancelNotification(withId: reminder.id.uuidString)
+
         PersistenceService.shared.deleteReminder(reminder)
         loadReminders()
     }
