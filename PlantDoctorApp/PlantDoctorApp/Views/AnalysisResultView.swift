@@ -122,6 +122,72 @@ struct AnalysisResultView: View {
                     }
                 }
 
+                // PlantDoctor 2.0 - Environmental Conditions
+                if let environmental = result.environmentalConditions {
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("🌿 Environmental Analysis")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+
+                        // Humidity
+                        EnvironmentalCard(
+                            icon: "humidity.fill",
+                            iconColor: .blue,
+                            title: "Humidity",
+                            current: environmental.humidity.current,
+                            ideal: environmental.humidity.ideal,
+                            recommendation: environmental.humidity.adjustment
+                        )
+
+                        // Light
+                        EnvironmentalCard(
+                            icon: "sun.max.fill",
+                            iconColor: .orange,
+                            title: "Light",
+                            current: environmental.light.current,
+                            ideal: "\(environmental.light.ideal) (\(environmental.light.hoursPerDay))",
+                            recommendation: environmental.light.adjustment
+                        )
+
+                        // Temperature
+                        EnvironmentalCard(
+                            icon: "thermometer.medium",
+                            iconColor: .red,
+                            title: "Temperature",
+                            current: environmental.temperature.current,
+                            ideal: environmental.temperature.ideal,
+                            recommendation: environmental.temperature.warnings.first ?? ""
+                        )
+
+                        // Soil Moisture
+                        EnvironmentalCard(
+                            icon: "drop.fill",
+                            iconColor: .cyan,
+                            title: "Soil Moisture",
+                            current: environmental.soilMoisture.current,
+                            ideal: "\(environmental.soilMoisture.ideal) - \(environmental.soilMoisture.wateringFrequency)",
+                            recommendation: environmental.soilMoisture.tips.first ?? ""
+                        )
+                    }
+                }
+
+                // Recovery time estimate
+                if let recoveryTime = result.estimatedRecoveryTime {
+                    HStack(spacing: 8) {
+                        Image(systemName: "clock.fill")
+                            .foregroundColor(.green)
+                        Text("Recovery Time:")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                        Text(recoveryTime)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 5)
+                }
+
                 // Confidence level
                 HStack {
                     Text("Confidence:")
@@ -141,6 +207,69 @@ struct AnalysisResultView: View {
             .padding()
         }
         .frame(maxHeight: 400)
+    }
+}
+
+// MARK: - Environmental Card Component (PlantDoctor 2.0)
+struct EnvironmentalCard: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let current: String
+    let ideal: String
+    let recommendation: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(iconColor)
+                    .font(.system(size: 18))
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+            }
+
+            HStack {
+                Text("Current:")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(current)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(statusColor)
+            }
+
+            HStack {
+                Text("Ideal:")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(ideal)
+                    .font(.caption)
+            }
+
+            if !recommendation.isEmpty {
+                Text("💡 \(recommendation)")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+                    .italic()
+            }
+        }
+        .padding(10)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(10)
+    }
+
+    private var statusColor: Color {
+        let currentLower = current.lowercased()
+        if currentLower.contains("good") || currentLower.contains("adequate") || currentLower.contains("healthy") {
+            return .green
+        } else if currentLower.contains("low") || currentLower.contains("insufficient") || currentLower.contains("high") || currentLower.contains("excessive") {
+            return .orange
+        } else if currentLower.contains("dry") || currentLower.contains("overwater") {
+            return .red
+        }
+        return .primary
     }
 }
 

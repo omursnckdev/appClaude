@@ -18,29 +18,36 @@ struct MainTabView: View {
                 }
                 .tag(0)
 
+            // PlantDoctor 2.0 - AI Calendar (Premium)
+            AICalendarView()
+                .tabItem {
+                    Label("AI Calendar", systemImage: "calendar.badge.clock")
+                }
+                .tag(1)
+
             HistoryView()
                 .tabItem {
                     Label("History", systemImage: "clock.arrow.circlepath")
                 }
-                .tag(1)
+                .tag(2)
 
             RemindersView()
                 .tabItem {
                     Label("Reminders", systemImage: "bell.fill")
                 }
-                .tag(2)
+                .tag(3)
 
             CommunityView()
                 .tabItem {
                     Label("Community", systemImage: "person.3.fill")
                 }
-                .tag(3)
+                .tag(4)
 
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
-                .tag(4)
+                .tag(5)
         }
         .accentColor(.green)
     }

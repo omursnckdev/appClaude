@@ -1,6 +1,17 @@
-# 🌱 Plant Doctor App
+# 🌱 PlantDoctor 2.0 - AI Plant Health Assistant
 
-An iOS app that uses AI to diagnose plant diseases and health issues. Simply take a photo of your plant, and the app will analyze it to identify problems and provide treatment recommendations.
+An advanced iOS app that uses AI to diagnose plant diseases, provide comprehensive environmental analysis, and generate intelligent care schedules. Simply take a photo of your plant, and the app will analyze it to identify problems, assess growing conditions, and create a personalized care calendar.
+
+## 🎉 What's New in 2.0
+
+- **🌡️ Environmental Analysis** - Comprehensive humidity, light, temperature, and soil moisture recommendations
+- **🗓️ AI Calendar (Premium)** - Intelligent automated scheduling for watering, fertilizing, and plant care
+- **📱 Offline Diagnosis** - Analyze plants without internet using on-device AI
+- **💎 Premium Subscription** - Unlock advanced features with flexible pricing
+- **⏱️ Recovery Estimates** - Know when your plant will recover
+- **📅 Seasonal Care** - Year-round care guidance for each plant
+
+[See complete 2.0 documentation](PLANTDOCTOR_2.0.md)
 
 ## Features
 
@@ -19,6 +30,15 @@ An iOS app that uses AI to diagnose plant diseases and health issues. Simply tak
 - 📄 **Export Reports** - Export individual analyses as PDF or entire history as CSV
 - 🔥 **Firebase Backend** - Secure image storage and data management
 - 🎨 **Beautiful SwiftUI Interface** - Modern, intuitive design with tab-based navigation
+
+### PlantDoctor 2.0 Premium Features
+- 🌡️ **Environmental Analysis** - Detailed humidity, light, temperature, and soil moisture assessment
+- 🗓️ **AI Calendar** - Automatically generated care schedules based on plant analysis
+- 📱 **Offline AI Diagnosis** - Analyze plants without internet using on-device Vision framework
+- ♾️ **Unlimited Scans** - No daily limits on plant analyses
+- ⏱️ **Recovery Estimates** - Get estimated timeframes for plant recovery
+- 📅 **Seasonal Care** - Season-specific care recommendations
+- 🎯 **Priority Support** - Get help faster with premium support
 
 ## Technology Stack
 

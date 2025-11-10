@@ -82,6 +82,16 @@ class PlantAnalysisViewModel: ObservableObject {
                 )
                 persistenceService.saveRecord(record)
 
+                // PlantDoctor 2.0 - Generate AI Calendar schedule for premium users
+                if await PremiumService.shared.hasAccess(to: .aiCalendar) {
+                    let aiSchedule = AICalendarService.shared.generateSchedule(
+                        from: result,
+                        plantRecord: record
+                    )
+                    AICalendarService.shared.saveSchedule(aiSchedule)
+                    print("✅ AI Calendar schedule generated for \(record.plantName ?? "plant")")
+                }
+
                 // Update UI
                 self.analysisResult = result
                 self.isAnalyzing = false
