@@ -9,11 +9,13 @@
 import Foundation
 import UIKit
 
+@MainActor
 class AICalendarService {
     static let shared = AICalendarService()
 
     private let persistenceKey = "AICalendarSchedules"
     private let userDefaults = UserDefaults.standard
+    private let notificationService = NotificationService.shared
 
     private init() {}
 
@@ -248,6 +250,27 @@ class AICalendarService {
         if let encoded = try? JSONEncoder().encode(schedules) {
             userDefaults.set(encoded, forKey: persistenceKey)
         }
+
+        // Schedule notifications for all care tasks
+        Task {
+            await scheduleNotificationsForSchedule(schedule)
+        }
+    }
+
+    private func scheduleNotificationsForSchedule(_ schedule: AICalendarSchedule) async {
+        for careSchedule in schedule.schedules {
+            do {
+                try await notificationService.scheduleCareReminder(
+                    id: careSchedule.id,
+                    plantName: schedule.plantName,
+                    reminderType: careSchedule.type.displayName,
+                    dueDate: careSchedule.nextDueDate,
+                    notes: careSchedule.notes
+                )
+            } catch {
+                print("Failed to schedule notification for \(careSchedule.type.displayName): \(error)")
+            }
+        }
     }
 
     func getAllSchedules() -> [AICalendarSchedule] {
@@ -263,6 +286,14 @@ class AICalendarService {
     }
 
     func deleteSchedule(id: String) {
+        // Get the schedule before deleting to cancel its notifications
+        if let schedule = getAllSchedules().first(where: { $0.id == id }) {
+            // Cancel all notifications for this schedule
+            for careSchedule in schedule.schedules {
+                notificationService.cancelNotification(withId: careSchedule.id)
+            }
+        }
+
         var schedules = getAllSchedules()
         schedules.removeAll { $0.id == id }
 
@@ -329,7 +360,8 @@ class AICalendarService {
         if let schedule = getSchedule(forPlantId: event.plantName) {
             var updatedSchedules = schedule.schedules
             if let index = updatedSchedules.firstIndex(where: { $0.id == event.schedule.id }) {
-                updatedSchedules[index] = event.schedule.reschedule()
+                let rescheduledCareSchedule = event.schedule.reschedule()
+                updatedSchedules[index] = rescheduledCareSchedule
 
                 let updatedSchedule = AICalendarSchedule(
                     id: schedule.id,
@@ -342,6 +374,21 @@ class AICalendarService {
                 )
 
                 updateSchedule(updatedSchedule)
+
+                // Reschedule notification for the updated care task
+                Task {
+                    do {
+                        try await notificationService.updateNotification(
+                            id: rescheduledCareSchedule.id,
+                            plantName: schedule.plantName,
+                            reminderType: rescheduledCareSchedule.type.displayName,
+                            newDueDate: rescheduledCareSchedule.nextDueDate,
+                            notes: rescheduledCareSchedule.notes
+                        )
+                    } catch {
+                        print("Failed to reschedule notification: \(error)")
+                    }
+                }
             }
         }
     }

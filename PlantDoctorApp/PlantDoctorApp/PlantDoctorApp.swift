@@ -10,6 +10,7 @@ import FirebaseCore
 
 @main
 struct PlantDoctorApp: App {
+    @StateObject private var notificationService = NotificationService.shared
 
     init() {
         FirebaseApp.configure()
@@ -18,6 +19,12 @@ struct PlantDoctorApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .onAppear {
+                    // Check notification authorization status on app launch
+                    Task {
+                        await notificationService.checkAuthorizationStatus()
+                    }
+                }
         }
     }
 }
